@@ -1,13 +1,12 @@
-// ⚠️ 這是你截圖中的 API Key
 const apiKey = 'f078b81e8cmshed755ca4dea5f70p1393e9jsnf05b9e444248';
 
-// --- 1. 自動抓取 NBA 比分功能 ---
 document.getElementById('fetchDataBtn').addEventListener('click', async function() {
     const status = document.getElementById('apiStatus');
-    status.innerText = "正在連線 RapidAPI...";
+    status.innerText = "連線中...";
     
-    // 取得今天日期 (格式 YYYY-MM-DD)
-    const today = "2026-04-27";
+    // 取得今天日期
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
     
     const options = {
         method: 'GET',
@@ -18,65 +17,69 @@ document.getElementById('fetchDataBtn').addEventListener('click', async function
     };
 
     try {
-        // 修正後的正確路徑：nba-scoreboard-by-date
-        const response = await fetch(`https://nba-api-free-data.p.rapidapi.com/nba-scoreboard-by-date?date=${today}`, options);
+        // 嘗試抓取今日比分
+        // 注意：這款 API 的 Endpoint 可能是 /nba-scoreboard 或 /nba-scoreboard-by-date
+        // 我們先嘗試最標準的格式
+        const response = await fetch(`https://nba-api-free-data.p.rapidapi.com/nba-scoreboard?date=${today}`, options);
         const data = await response.json();
 
-        console.log("API 原始回傳:", data);
+        console.log("API 回傳結果:", data);
 
-        // 解析這款 API 的結構 (通常在 data.results 裡)
-        const games = data.results || data.games || [];
+        // 解析資料邏輯
+        let games = [];
+        if (data.results) {
+            games = data.results;
+        } else if (data.scoreboard && data.scoreboard.games) {
+            games = data.scoreboard.games;
+        }
 
-        if (games.length > 0) {
-            // 抓取第一場比賽作為範例
+        if (games && games.length > 0) {
             const game = games[0];
             
-            // 自動填入分數與節數 (相容多種欄位命名)
-            document.getElementById('homeScore').value = game.home_team_score || 0;
-            document.getElementById('awayScore').value = game.away_team_score || 0;
+            // 填入數據 (相容不同欄位名)
+            document.getElementById('homeScore').value = game.home_team_score || game.hTeam?.score || 0;
+            document.getElementById('awayScore').value = game.away_team_score || game.vTeam?.score || 0;
             document.getElementById('quarter').value = game.period || 1;
             
-            const homeName = game.home_team_name || "主隊";
-            const awayName = game.away_team_name || "客隊";
-            status.innerText = `✅ 已更新：${homeName} vs ${awayName}`;
+            const hName = game.home_team_name || "主隊";
+            const vName = game.away_team_name || "客隊";
+            status.innerText = `✅ 同步成功：${hName} vs ${vName}`;
         } else {
-            status.innerText = `😴 API 顯示 ${today} 暫無比賽數據`;
+            // 如果今天沒比賽，嘗試抓「昨天」的來測試功能
+            status.innerText = `今日 (${today}) 暫無比賽，嘗試抓取昨日數據...`;
+            const yesterday = new Date(now.setDate(now.getDate() - 1)).toISOString().split('T')[0];
+            const oldRes = await fetch(`https://nba-api-free-data.p.rapidapi.com/nba-scoreboard?date=${yesterday}`, options);
+            const oldData = await oldRes.json();
+            
+            if (oldData.results && oldData.results.length > 0) {
+                const oldGame = oldData.results[0];
+                document.getElementById('homeScore').value = oldGame.home_team_score;
+                document.getElementById('awayScore').value = oldGame.away_team_score;
+                status.innerText = `✅ 已顯示昨日 (${yesterday}) 比分供測試`;
+            } else {
+                status.innerText = "😴 目前 API 端點暫無數據，請確認 RapidAPI 訂閱狀態";
+            }
         }
     } catch (error) {
-        console.error("抓取失敗:", error);
-        status.innerText = "❌ 失敗！請檢查 API 網址或 Key 是否正確";
+        console.error("API 錯誤:", error);
+        status.innerText = "❌ 連線失敗，請檢查網路或 API Key";
     }
 });
 
-// --- 2. 勝率計算功能 ---
+// 計算功能保持不變
 document.getElementById('predictBtn').addEventListener('click', function() {
-    // 讀取網頁上的數值
     const home = parseFloat(document.getElementById('homeScore').value) || 0;
     const away = parseFloat(document.getElementById('awayScore').value) || 0;
     const quarter = parseInt(document.getElementById('quarter').value);
     const qTimeL = parseFloat(document.getElementById('quarterTime').value) || 0;
-    
-    // 邏輯：計算目前已比賽的總時間 (NBA 每節 12 分鐘，總共 48 分鐘)
     const timePlayed = (quarter - 1) * 12 + (12 - qTimeL);
-    const safeTime = timePlayed <= 0 ? 0.1 : timePlayed; // 防止除以 0
-    
-    // 步驟 A：計算預估終場比分 (按比例放大)
+    const safeTime = timePlayed <= 0 ? 0.1 : timePlayed;
     const homeFinal = Math.round((home / safeTime) * 48);
     const awayFinal = Math.round((away / safeTime) * 48);
-    
-    // 步驟 B：利用畢達哥拉斯公式計算勝率 (指數 13.91)
     const power = 13.91;
-    const homeP = Math.pow(homeFinal, power);
-    const awayP = Math.pow(awayFinal, power);
-    const homeWinRate = ((homeP / (homeP + awayP)) * 100).toFixed(1);
-
-    // 顯示結果
+    const homeWinRate = ((Math.pow(homeFinal, power) / (Math.pow(homeFinal, power) + Math.pow(awayFinal, power))) * 100).toFixed(1);
     document.getElementById('result').style.display = 'block';
     document.getElementById('finalScore').innerText = `${homeFinal} : ${awayFinal}`;
     document.getElementById('winRate').innerText = `${homeWinRate}%`;
-    
-    // 視覺回饋：贏球變綠色背景，輸球變紅色背景
-    document.body.style.background = homeFinal >= awayFinal ? 
-        "linear-gradient(135deg, #1d976c, #93f9b9)" : 
-        "linear-gradient(135deg, #eb3349, #f45c43)";
+    document.body.style.background = homeFinal >= awayFinal ? "linear-gradient(135deg, #1d976c, #93f9b9)" : "linear-gradient(135deg, #eb3349, #f45c43)";
 });
