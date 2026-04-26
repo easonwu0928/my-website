@@ -1,18 +1,21 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <title>測試網站</title>
-    <link rel="icon" href="favicon.ico.png" type="image/png">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="card">
-        <h1>我是吳識宇</h1>
-        <p>學習中</p>
-        <button id="btn">點我觸發魔法</button>
+<div class="card">
+    <h1>NBA 即時預測器</h1>
+    <div class="input-group">
+        <label>主隊目前得分：</label>
+        <input type="number" id="homeScore" value="50">
     </div>
-    
-    <script src="script.js"></script>
-</body>
-</html>
+    <div class="input-group">
+        <label>客隊目前得分：</label>
+        <input type="number" id="awayScore" value="48">
+    </div>
+    <div class="input-group">
+        <label>剩餘時間 (分鐘)：</label>
+        <input type="number" id="timeLeft" value="12">
+    </div>
+    <button id="predictBtn">計算預測結果</button>
+
+    <div id="result" style="margin-top: 20px; display: none;">
+        <h3>預估終場：<span id="finalScore"></span></h3>
+        <p>預估勝率：<span id="winRate"></span></p>
+    </div>
+</div>

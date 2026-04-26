@@ -1,44 +1,11 @@
-/* 設定整體的背景與對齊 */
-body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+.input-group {
+    margin: 15px 0;
+    text-align: left;
 }
-
-/* 這是那個白色卡片的樣式 */
-.card {
-    background: white;
-    padding: 30px 50px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    text-align: center;
-    transition: transform 0.3s ease;
-}
-
-/* 當滑鼠移到卡片上時會微微跳動 */
-.card:hover {
-    transform: translateY(-10px);
-}
-
-h1 {
-    color: #333;
-}
-
-button {
-    background-color: #764ba2;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 30px;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
-}
-
-button:active {
-    transform: scale(0.95);
+input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    margin-top: 5px;
 }
