@@ -15,6 +15,19 @@
             <input type="number" id="homeScore" value="50">
         </div>
         <div class="input-group">
+            <label>目前節數：</label>
+            <select id="quarter">
+                <option value="1">第一節</option>
+                <option value="2">第二節</option>
+                <option value="3">第三節</option>
+                <option value="4">第四節</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>該節剩餘時間 (分鐘)：</label>
+            <input type="number" id="quarterTime" value="12" min="0" max="12">
+        </div>
+        <div class="input-group">
             <label>客隊目前得分：</label>
             <input type="number" id="awayScore" value="48">
         </div>

@@ -63,3 +63,11 @@ hr {
     border-top: 1px solid #eee;
     margin: 20px 0;
 }
+select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    width: 100%; /* 讓下拉選單寬度整齊 */
+    font-size: 16px;
+    background-color: white;
+}
