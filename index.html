@@ -45,4 +45,54 @@
     </div>
     <script src="script.js"></script>
 </body>
+<div class="api-section" style="margin-bottom: 20px;">
+            <button id="fetchDataBtn" style="background-color: #3498db;">🔄 自動抓取今日比分</button>
+            <p id="apiStatus" style="font-size: 12px; color: #666;"></p>
+        </div>
+        <hr>
+        ```
+
+---
+
+### 第三步：修改 `script.js` (加入抓取邏輯)
+
+這段代碼會去向伺服器要資料。**請注意：** 因為安全性問題，正式產品通常會在「後端」做這件事，但我們現在先用前端練習。
+
+```javascript
+const apiKey = '你的_RAPIDAPI_KEY_貼在這裡'; // ⚠️ 把你的 Key 貼過來
+
+document.getElementById('fetchDataBtn').addEventListener('click', async function() {
+    const status = document.getElementById('apiStatus');
+    status.innerText = "連線中...";
+
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': apiKey,
+            'X-RapidAPI-Host': 'api-nba-v1.p.rapidapi.com'
+        }
+    };
+
+    try {
+        // 這裡以抓取當天的比賽為例
+        const response = await fetch('https://api-nba-v1.p.rapidapi.com/games?date=2024-04-27', options);
+        const data = await response.json();
+        
+        if (data.response.length > 0) {
+            const game = data.response[0]; // 拿第一場比賽當範例
+            
+            // 自動填入資料
+            document.getElementById('homeScore').value = game.scores.home.points;
+            document.getElementById('awayScore').value = game.scores.visitors.points;
+            document.getElementById('quarter').value = game.periods.current;
+            
+            status.innerText = `已同步：${game.teams.home.name} vs ${game.teams.visitors.name}`;
+        } else {
+            status.innerText = "今日暫無比賽";
+        }
+    } catch (error) {
+        console.error(error);
+        status.innerText = "抓取失敗，請檢查 Key";
+    }
+});
 </html>
