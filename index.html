@@ -3,96 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA 賽中勝率預測器</title>
-    <link rel="icon" href="favicon.ico.png" type="image/x-icon">
+    <title>NBA 即時勝率預測器</title>
+    <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="card">
-        <h1>🏀 NBA 即時預測</h1>
-        <div class="input-group">
-            <label>主隊目前得分：</label>
-            <input type="number" id="homeScore" value="50">
-        </div>
-        <div class="input-group">
-            <label>客隊目前得分：</label>
-            <input type="number" id="awayScore" value="48">
-        </div>
-        <div class="input-group">
-            <label>目前節數：</label>
-            <select id="quarter">
-                <option value="1">第一節</option>
-                <option value="2">第二節</option>
-                <option value="3">第三節</option>
-                <option value="4">第四節</option>
-            </select>
-        </div>
-        <div class="input-group">
-            <label>該節剩餘時間 (分鐘)：</label>
-            <input type="number" id="quarterTime" value="12" min="0" max="12">
-        </div>
-        <div class="input-group">
-            <label>剩餘時間 (分鐘)：</label>
-            <input type="number" id="timeLeft" value="12">
-        </div>
-        <button id="predictBtn">計算預估結果</button>
+    <div class="container">
+        <div class="card">
+            <h1>🏀 NBA 即時預測</h1>
+            
+            <div class="api-section">
+                <button id="fetchDataBtn">🔄 自動抓取今日比分</button>
+                <p id="apiStatus">尚未同步數據</p>
+            </div>
 
-        <div id="result" style="margin-top: 20px; display: none;">
             <hr>
-            <h3>預估終場：<span id="finalScore"></span></h3>
-            <p id="winRateDisplay">主隊勝率預估：<span id="winRate"></span></p>
+
+            <div class="input-group">
+                <label>主隊目前得分：</label>
+                <input type="number" id="homeScore" value="0">
+            </div>
+            <div class="input-group">
+                <label>客隊目前得分：</label>
+                <input type="number" id="awayScore" value="0">
+            </div>
+            <div class="input-group">
+                <label>目前節數：</label>
+                <select id="quarter">
+                    <option value="1">第一節</option>
+                    <option value="2">第二節</option>
+                    <option value="3">第三節</option>
+                    <option value="4">第四節</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>該節剩餘時間 (分鐘)：</label>
+                <input type="number" id="quarterTime" value="12" min="0" max="12">
+            </div>
+
+            <button id="predictBtn" class="predict-btn">🚀 開始計算勝率</button>
+
+            <div id="result" style="display: none;">
+                <hr>
+                <h3>預估終場：<span id="finalScore"></span></h3>
+                <p>主隊勝率：<span id="winRate"></span></p>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
 </body>
-<div class="api-section" style="margin-bottom: 20px;">
-            <button id="fetchDataBtn" style="background-color: #3498db;">🔄 自動抓取今日比分</button>
-            <p id="apiStatus" style="font-size: 12px; color: #666;"></p>
-        </div>
-        <hr>
-        ```
-
----
-
-### 第三步：修改 `script.js` (加入抓取邏輯)
-
-這段代碼會去向伺服器要資料。**請注意：** 因為安全性問題，正式產品通常會在「後端」做這件事，但我們現在先用前端練習。
-
-```javascript
-const apiKey = '你的_RAPIDAPI_KEY_貼在這裡'; // ⚠️ 把你的 Key 貼過來
-
-document.getElementById('fetchDataBtn').addEventListener('click', async function() {
-    const status = document.getElementById('apiStatus');
-    status.innerText = "連線中...";
-
-    const options = {
-        method: 'GET',
-        headers: {
-            'X-RapidAPI-Key': apiKey,
-            'X-RapidAPI-Host': 'api-nba-v1.p.rapidapi.com'
-        }
-    };
-
-    try {
-        // 這裡以抓取當天的比賽為例
-        const response = await fetch('https://api-nba-v1.p.rapidapi.com/games?date=2024-04-27', options);
-        const data = await response.json();
-        
-        if (data.response.length > 0) {
-            const game = data.response[0]; // 拿第一場比賽當範例
-            
-            // 自動填入資料
-            document.getElementById('homeScore').value = game.scores.home.points;
-            document.getElementById('awayScore').value = game.scores.visitors.points;
-            document.getElementById('quarter').value = game.periods.current;
-            
-            status.innerText = `已同步：${game.teams.home.name} vs ${game.teams.visitors.name}`;
-        } else {
-            status.innerText = "今日暫無比賽";
-        }
-    } catch (error) {
-        console.error(error);
-        status.innerText = "抓取失敗，請檢查 Key";
-    }
-});
 </html>

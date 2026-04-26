@@ -1,61 +1,70 @@
+/* 全域設定：確保背景填滿畫面並置中 */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* 深色專業背景 */
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    min-height: 100vh;
     color: #333;
-    transition: background 0.5s ease;
+    transition: background 0.8s ease; /* 計算結果出來時換背景色會更平滑 */
 }
 
+/* 容器：確保內容在畫面正中央 */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+/* 卡片主體 */
 .card {
-    background: white;
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 380px; /* 寬度適中，手機看也漂亮 */
     text-align: center;
-    width: 320px;
 }
 
-.input-group {
-    margin: 15px 0;
-    text-align: left;
+h1 {
+    color: #1e3c72;
+    margin-top: 0;
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
-label {
-    font-size: 14px;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
+/* API 按鈕區域 */
+.api-section {
+    margin-bottom: 20px;
 }
 
-input {
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    width: 90%;
-    font-size: 16px;
-}
-
-button {
-    background-color: #f39c12;
+#fetchDataBtn {
+    background: #3498db;
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 50px;
+    padding: 12px;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
     width: 100%;
-    margin-top: 10px;
-    transition: transform 0.2s;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background 0.3s;
 }
 
-button:hover {
-    transform: scale(1.05);
-    background-color: #e67e22;
+#fetchDataBtn:hover {
+    background: #2980b9;
+}
+
+#apiStatus {
+    font-size: 13px;
+    margin-top: 10px;
+    color: #666;
+    font-style: italic;
 }
 
 hr {
@@ -63,11 +72,81 @@ hr {
     border-top: 1px solid #eee;
     margin: 20px 0;
 }
-select {
-    padding: 10px;
-    border-radius: 8px;
+
+/* 輸入框群組 */
+.input-group {
+    margin: 15px 0;
+    text-align: left;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input, select {
+    padding: 12px;
+    border-radius: 10px;
     border: 1px solid #ddd;
-    width: 100%; /* 讓下拉選單寬度整齊 */
+    width: 100%;
+    box-sizing: border-box; /* 確保寬度包含內距 */
     font-size: 16px;
-    background-color: white;
+    background: #fdfdfd;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+/* 計算按鈕 */
+.predict-btn {
+    background: #e67e22;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: all 0.2s;
+}
+
+.predict-btn:hover {
+    background: #d35400;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+}
+
+/* 結果顯示區域 */
+#result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f0f4f8;
+    border-radius: 15px;
+    animation: slideUp 0.4s ease-out;
+}
+
+#finalScore {
+    font-size: 22px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+#winRate {
+    font-size: 28px;
+    font-weight: 800;
+    color: #e67e22;
+}
+
+/* 動畫效果 */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
