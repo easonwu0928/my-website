@@ -1,21 +1,35 @@
-<div class="card">
-    <h1>NBA 即時預測器</h1>
-    <div class="input-group">
-        <label>主隊目前得分：</label>
-        <input type="number" id="homeScore" value="50">
-    </div>
-    <div class="input-group">
-        <label>客隊目前得分：</label>
-        <input type="number" id="awayScore" value="48">
-    </div>
-    <div class="input-group">
-        <label>剩餘時間 (分鐘)：</label>
-        <input type="number" id="timeLeft" value="12">
-    </div>
-    <button id="predictBtn">計算預測結果</button>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA 賽中勝率預測器</title>
+    <link rel="icon" href="favicon.ico.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="card">
+        <h1>🏀 NBA 即時預測</h1>
+        <div class="input-group">
+            <label>主隊目前得分：</label>
+            <input type="number" id="homeScore" value="50">
+        </div>
+        <div class="input-group">
+            <label>客隊目前得分：</label>
+            <input type="number" id="awayScore" value="48">
+        </div>
+        <div class="input-group">
+            <label>剩餘時間 (分鐘)：</label>
+            <input type="number" id="timeLeft" value="12">
+        </div>
+        <button id="predictBtn">計算預估結果</button>
 
-    <div id="result" style="margin-top: 20px; display: none;">
-        <h3>預估終場：<span id="finalScore"></span></h3>
-        <p>預估勝率：<span id="winRate"></span></p>
+        <div id="result" style="margin-top: 20px; display: none;">
+            <hr>
+            <h3>預估終場：<span id="finalScore"></span></h3>
+            <p id="winRateDisplay">主隊勝率預估：<span id="winRate"></span></p>
+        </div>
     </div>
-</div>
+    <script src="script.js"></script>
+</body>
+</html>
