@@ -7,7 +7,7 @@ document.getElementById('fetchDataBtn').addEventListener('click', async function
     status.innerText = "正在連線 RapidAPI...";
     
     // 取得今天日期 (格式 YYYY-MM-DD)
-    const today = "2026-04-26";
+    const today = "2026-04-27";
     
     const options = {
         method: 'GET',
