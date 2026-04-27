@@ -2,53 +2,60 @@ const apiKey = 'f078b81e8cmshed755ca4dea5f70p1393e9jsnf05b9e444248';
 
 document.getElementById('fetchDataBtn').addEventListener('click', async function() {
     const status = document.getElementById('apiStatus');
-    status.innerText = "連線中...";
+    status.innerText = "連線中，請稍候...";
+    
+    // NBA 數據通常在台灣時間早晨更新，凌晨 4 點建議抓前一天的穩定數據
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = "2026-04-26"; 
 
     const options = {
         method: 'GET',
         headers: {
             'x-rapidapi-key': apiKey,
-            'x-rapidapi-host': 'api-basketball.p.rapidapi.com' // 確保是這個 Host
+            'x-rapidapi-host': 'nba-api-free-data.p.rapidapi.com'
         }
     };
 
-    try {
-        // 抓取 NBA (League 12) 的比賽
-        // 注意：如果你剛剛才點訂閱，請等待約 1-2 分鐘讓伺服器同步
-        const response = await fetch('https://api-basketball.p.rapidapi.com/games?league=12&season=2025-2026', options);
+    async function tryFetch(date) {
+        try {
+            const url = `https://nba-api-free-data.p.rapidapi.com/nba-scoreboard-by-date?date=${date}`;
+            const response = await fetch(url, options);
+            const data = await response.json();
+            
+            // 如果 API 回傳 "failed"，代表後端伺服器掛了
+            if (data.status === "failed") {
+                console.warn(`日期 ${date} 抓取失敗: ${data.message}`);
+                return null;
+            }
+            return data;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // 優先抓今天，失敗就抓昨天
+    let finalData = await tryFetch(today);
+    let usedDate = today;
+
+    if (!finalData || !finalData.results || finalData.results.length === 0) {
+        status.innerText = "今日數據更新中，嘗試抓取昨日穩定數據...";
+        finalData = await tryFetch(yesterday);
+        usedDate = yesterday;
+    }
+
+    if (finalData && finalData.results && finalData.results.length > 0) {
+        const game = finalData.results[0];
+        document.getElementById('homeScore').value = game.home_team_score || 0;
+        document.getElementById('awayScore').value = game.away_team_score || 0;
+        document.getElementById('quarter').value = game.period || 1;
         
-        // 如果還是 403，我們會抓到這個錯誤
-        if (response.status === 403) {
-            status.innerText = "❌ 403：權限尚未生效，請稍等一分鐘再試或確認已點擊 Subscribe";
-            return;
-        }
-
-        const data = await response.json();
-        console.log("成功抓取資料:", data);
-
-        // 找尋有分數的比賽
-        const games = data.response ? data.response.filter(g => g.scores.home.total !== null) : [];
-
-        if (games.length > 0) {
-            const game = games[games.length - 1]; // 抓最新一場
-            document.getElementById('homeScore').value = game.scores.home.total;
-            document.getElementById('awayScore').value = game.scores.away.total;
-            
-            // 自動判斷節數
-            const q = game.status.short === "FT" ? "4" : (game.status.short.replace(/[^0-9]/g, '') || "1");
-            document.getElementById('quarter').value = q;
-            
-            status.innerText = `✅ 已同步：${game.teams.home.name} vs ${game.teams.away.name}`;
-        } else {
-            status.innerText = "😴 目前無進行中的 NBA 比賽";
-        }
-    } catch (error) {
-        console.error(error);
-        status.innerText = "❌ 連線異常，請確認 API Key 是否正確";
+        status.innerText = `✅ 同步成功 (${usedDate})：${game.home_team_name} vs ${game.away_team_name}`;
+    } else {
+        status.innerText = "⚠️ API 伺服器目前繁忙，請 1 分鐘後再試";
     }
 });
 
-// 計算功能
+// 計算勝率邏輯 (保持不變)
 document.getElementById('predictBtn').addEventListener('click', function() {
     const h = parseFloat(document.getElementById('homeScore').value) || 0;
     const a = parseFloat(document.getElementById('awayScore').value) || 0;
@@ -62,5 +69,4 @@ document.getElementById('predictBtn').addEventListener('click', function() {
     document.getElementById('result').style.display = 'block';
     document.getElementById('finalScore').innerText = `${hF} : ${aF}`;
     document.getElementById('winRate').innerText = `${homeWinRate}%`;
-    document.body.style.background = hF >= aF ? "linear-gradient(135deg, #1d976c, #93f9b9)" : "linear-gradient(135deg, #eb3349, #f45c43)";
 });
