@@ -57,42 +57,45 @@
             <button id="predictBtn">🚀 開始預測</button>
         </div>
 
-        <div class="result-item">
-             <h3>預測終場比分</h3>
-             <p id="finalScore" class="big-text">-- : --</p>
-             <div class="total-info">
-                 <span class="tag current">目前總分: <b id="currentTotal">0</b></span>
-                 <span class="tag projected">預估總分: <b id="projectedTotal">0</b></span>
-             </div>
-         </div>
-
-        <div id="result" class="result-card" style="display: none;">
-            <div class="result-grid">
-                <div class="result-item">
-                    <h3>預測終場比分</h3>
-                    <p id="finalScore" class="big-text">-- : --</p>
-                </div>
-                <div class="result-item">
-                    <h3>主隊預估勝率</h3>
-                    <p id="winRate" class="big-text">--%</p>
-                </div>
+<div id="result" class="result-card" style="display: none;">
+    <div class="result-header">LIVE PREDICTION</div>
+    
+    <div class="score-summary-box">
+        <div class="result-grid">
+            <div class="res-item">
+                <span class="res-label">預測最終比分</span>
+                <span id="finalScore" class="res-value">-- : --</span>
             </div>
-
-            <div id="halfProbContainer" class="probability-container" style="display:none;">
-                <div class="prob-header">
-                    <span>中場大分機率 (預測總分: <b id="halfProjTotal">0</b>)</span>
-                    <span id="halfProbPercent" class="prob-num">0%</span>
-                </div>
-                <div class="prob-bar-bg"><div id="halfProbBar" class="prob-bar-fill orange"></div></div>
+            <div class="res-item">
+                <span class="res-label">主隊預估勝率</span>
+                <span id="winRate" class="res-value">--%</span>
             </div>
+        </div>
 
-            <div class="probability-container">
-                <div class="prob-header">
-                    <span>終場大分機率 (預測總分: <b id="fullProjTotal">0</b>)</span>
-                    <span id="fullProbPercent" class="prob-num">0%</span>
-                </div>
-                <div class="prob-bar-bg"><div id="fullProbBar" class="prob-bar-fill blue"></div></div>
-            </div>
+        <div class="total-status-bar">
+            <span class="tag-label current">目前總分：<b id="currentTotal">0</b></span>
+            <span class="tag-label projected">預估總分：<b id="projectedTotal">0</b></span>
+        </div>
+    </div>
+
+    <div id="halfProbContainer" class="probability-container" style="display:none;">
+        <div class="prob-header">
+            <span>中場大分機率 (預測總分: <b id="halfProjTotal">0</b>)</span>
+            <span id="halfProbPercent" class="prob-num">0%</span>
+        </div>
+        <div class="prob-bar-bg"><div id="halfProbBar" class="prob-bar-fill orange"></div></div>
+    </div>
+
+    <div class="probability-container">
+        <div class="prob-header">
+            <span>終場大分機率 (預測總分: <b id="fullProjTotal">0</b>)</span>
+            <span id="fullProbPercent" class="prob-num">0%</span>
+        </div>
+        <div class="prob-bar-bg"><div id="fullProbBar" class="prob-bar-fill blue"></div></div>
+    </div>
+
+    <div id="analysis" class="analysis-box"></div>
+</div>
 
             <div id="analysis" class="analysis-box"></div>
         </div>
