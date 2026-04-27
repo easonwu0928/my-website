@@ -1,81 +1,56 @@
 document.getElementById('predictBtn').addEventListener('click', function() {
-    // 1. 取得輸入值
-    const homeScore = parseFloat(document.getElementById('homeScore').value);
-    const awayScore = parseFloat(document.getElementById('awayScore').value);
-    const quarter = parseInt(document.getElementById('quarter').value);
-    
-    // 取得分與秒
-    const minLeft = parseFloat(document.getElementById('minLeft').value) || 0;
-    const secLeft = parseFloat(document.getElementById('secLeft').value) || 0;
-    
-    const lineHalf = parseFloat(document.getElementById('lineHalf').value);
-    const lineFull = parseFloat(document.getElementById('lineFull').value);
+    const h = parseFloat(document.getElementById('homeScore').value);
+    const a = parseFloat(document.getElementById('awayScore').value);
+    const q = parseInt(document.getElementById('quarter').value);
+    const m = parseFloat(document.getElementById('minLeft').value) || 0;
+    const s = parseFloat(document.getElementById('secLeft').value) || 0;
+    const lH = parseFloat(document.getElementById('lineHalf').value);
+    const lF = parseFloat(document.getElementById('lineFull').value);
 
-    // 2. 基礎檢查
-    if (isNaN(homeScore) || isNaN(awayScore)) {
-        alert("請輸入目前得分！");
-        return;
-    }
+    if (isNaN(h) || isNaN(a)) return alert("請輸入分數");
 
-    // 3. 計算總已比賽時間 (NBA 每節 12 分鐘，總共 48 分鐘)
-    // 將分秒轉換為十進位分鐘數 (例如 2:02 變成 2.033 分鐘)
-    const totalTimeLeftInQuarter = minLeft + (secLeft / 60);
-    const minutesPlayedInQuarter = 12 - totalTimeLeftInQuarter;
-    const totalMinutesPlayed = (quarter - 1) * 12 + minutesPlayedInQuarter;
-    const safePlayed = totalMinutesPlayed <= 0 ? 0.1 : totalMinutesPlayed;
+    // 計算時間
+    const playedInQ = 12 - (m + s/60);
+    const totalPlayed = (q - 1) * 12 + playedInQ;
+    const safeT = totalPlayed <= 0 ? 0.1 : totalPlayed;
 
-    // 4. 預測邏輯
-    const homeFull = Math.round((homeScore / safePlayed) * 48);
-    const awayFull = Math.round((awayScore / safePlayed) * 48);
-    
-    let halfResultHtml = "";
-    if (totalMinutesPlayed < 24) {
-        const homeHalf = Math.round((homeScore / safePlayed) * 24);
-        const awayHalf = Math.round((awayScore / safePlayed) * 24);
-        halfResultHtml = `<br><span style="font-size:16px; color:#666;">預測中場: ${homeHalf} : ${awayHalf}</span>`;
-    }
+    // 預測分數
+    const hF = Math.round((h / safeT) * 48);
+    const aF = Math.round((a / safeT) * 48);
+    const predictedTotal = hF + aF;
 
-    // 5. 勝率計算 (畢氏勝率公式 13.91)
-    const power = 13.91;
-    const winRate = (Math.pow(homeFull, power) / (Math.pow(homeFull, power) + Math.pow(awayFull, power))) * 100;
+    // 勝率
+    const winRate = (Math.pow(hF, 13.91) / (Math.pow(hF, 13.91) + Math.pow(aF, 13.91))) * 100;
 
-    // 6. 運彩過關分析
-    let analysisHtml = `<strong style="color:#4a90e2;">🔍 運彩過關深度分析：</strong><br>`;
-    
-    // 中場分析
-    if (!isNaN(lineHalf) && totalMinutesPlayed < 24) {
-        const predictedHalfTotal = Math.round((homeScore / safePlayed) * 24) + Math.round((awayScore / safePlayed) * 24);
-        const halfDiff = (predictedHalfTotal - lineHalf).toFixed(1);
-        const halfRecommend = halfDiff > 0 ? 
-            '<span class="tag" style="background:#27ae60;">大分</span>' : 
-            '<span class="tag" style="background:#e74c3c;">小分</span>';
-        analysisHtml += `• 中場盤口(${lineHalf}): 預測總分 ${predictedHalfTotal}，距過關差 <b>${Math.abs(halfDiff)}</b> 分 ${halfRecommend}<br>`;
-    }
-
-    // 終場分析
-    if (!isNaN(lineFull)) {
-        const predictedTotal = homeFull + awayFull;
-        const diff = (predictedTotal - lineFull).toFixed(1);
-        const recommend = diff > 0 ? 
-            '<span class="tag" style="background:#27ae60;">大分</span>' : 
-            '<span class="tag" style="background:#e74c3c;">小分</span>';
-        
-        let confidence = (50 + (Math.abs(diff) / 10) * 5).toFixed(1);
-        if (confidence > 95) confidence = 95.0;
-
-        analysisHtml += `• 終場盤口(${lineFull}): 預測總分 ${predictedTotal}，距過關差 <b>${Math.abs(diff)}</b> 分 ${recommend}<br>`;
-        analysisHtml += `• 預估過關率: ${confidence}%<br>`;
-    }
-
-    // 7. 渲染結果
+    // 渲染
     document.getElementById('result').style.display = 'block';
-    document.getElementById('finalScore').innerHTML = `${homeFull} : ${awayFull}${halfResultHtml}`;
+    document.getElementById('finalScore').innerText = `${hF} : ${aF}`;
     document.getElementById('winRate').innerText = `${winRate.toFixed(1)}%`;
-    document.getElementById('analysis').innerHTML = analysisHtml;
 
-    // 8. 視覺回饋
-    document.body.style.background = homeFull >= awayFull ? 
-        "linear-gradient(135deg, #1d976c, #93f9b9)" : "linear-gradient(135deg, #eb3349, #f45c43)";
+    let analysis = "🔍 盤口分析：<br>";
+    let wonLine = false;
 
-    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+    if (!isNaN(lF)) {
+        const diff = (predictedTotal - lF).toFixed(1);
+        const direction = diff > 0 ? "大分" : "小分";
+        analysis += `終場線 ${lF} | 預計 ${predictedTotal} (${direction})<br>距離過盤差 ${Math.abs(diff)} 分`;
+        
+        // 假設預測分數高於分數線且差距超過 0 分就「撒彩帶」慶祝
+        if (Math.abs(diff) > 0) wonLine = true;
+    }
+
+    document.getElementById('analysis').innerHTML = analysis;
+
+    // 觸發彩帶效果
+    if (wonLine) {
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#4facfe', '#00f2fe', '#4ade80']
+        });
+    }
+
+    // 根據領先方改變發光色
+    document.querySelector('.result-card').style.borderColor = hF >= aF ? '#4ade80' : '#f87171';
 });
