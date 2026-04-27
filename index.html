@@ -3,51 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA 即時勝率預測器</title>
+    <title>NBA 即時賽事結果預測器</title>
     <link rel="icon" href="favicon.ico.png" type="image/png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
+        <h1>🏀 NBA 賽事深度分析</h1>
+        
         <div class="card">
-            <h1>🏀 NBA 即時預測</h1>
-            
-            <div class="api-section">
-                <button id="fetchDataBtn">🔄 自動抓取今日比分</button>
-                <p id="apiStatus">尚未同步數據</p>
-            </div>
-
-            <hr>
-
+            <div class="section-title">比賽現況輸入</div>
             <div class="input-group">
                 <label>主隊目前得分：</label>
-                <input type="number" id="homeScore" value="0">
+                <input type="number" id="homeScore" placeholder="0">
             </div>
             <div class="input-group">
                 <label>客隊目前得分：</label>
-                <input type="number" id="awayScore" value="0">
+                <input type="number" id="awayScore" placeholder="0">
             </div>
-            <div class="input-group">
-                <label>目前節數：</label>
-                <select id="quarter">
-                    <option value="1">第一節</option>
-                    <option value="2">第二節</option>
-                    <option value="3">第三節</option>
-                    <option value="4">第四節</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>該節剩餘時間 (分鐘)：</label>
-                <input type="number" id="quarterTime" value="12" min="0" max="12">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>目前節數：</label>
+                    <select id="quarter">
+                        <option value="1">第一節</option>
+                        <option value="2">第二節</option>
+                        <option value="3">第三節</option>
+                        <option value="4">第四節</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>剩餘時間：</label>
+                    <div style="display: flex; gap: 5px; align-items: center;">
+                        <input type="number" id="minLeft" placeholder="分" min="0" max="12">
+                        <span>:</span>
+                        <input type="number" id="secLeft" placeholder="秒" min="0" max="59">
+                    </div>
+                </div>
             </div>
 
-            <button id="predictBtn" class="predict-btn">🚀 開始計算勝率</button>
-
-            <div id="result" style="display: none;">
-                <hr>
-                <h3>預估終場：<span id="finalScore"></span></h3>
-                <p>主隊勝率：<span id="winRate"></span></p>
+            <hr>
+            <div class="section-title">運彩盤口分數 (選填)</div>
+            <div class="input-row">
+                <div class="input-group">
+                    <label>中場盤口：</label>
+                    <input type="number" id="lineHalf" step="0.5" placeholder="例如: 110.5">
+                </div>
+                <div class="input-group">
+                    <label>終場盤口：</label>
+                    <input type="number" id="lineFull" step="0.5" placeholder="例如: 220.5">
+                </div>
             </div>
+
+            <button id="predictBtn">🚀 開始深度計算</button>
+        </div>
+
+        <div id="result" class="result-card" style="display: none;">
+            <div class="result-grid">
+                <div class="result-item">
+                    <h3>預測終場比分</h3>
+                    <p id="finalScore" class="big-text">-- : --</p>
+                </div>
+                <div class="result-item">
+                    <h3>主隊預估勝率</h3>
+                    <p id="winRate" class="big-text">--%</p>
+                </div>
+            </div>
+            <div id="analysis" class="analysis-box"></div>
         </div>
     </div>
     <script src="script.js"></script>
