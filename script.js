@@ -29,7 +29,7 @@ document.getElementById('predictBtn').addEventListener('click', function() {
     document.getElementById('projectedTotal').innerText = projTotal;
     document.getElementById('fullProjTotal').innerText = projTotal;
 
-    let analysis = "🔍 <b>深度盤口分析：</b><br>";
+    let analysis = "🔍 <b>深度盤口分析及預測：</b><br>";
     let shouldConfetti = false;
 
     // 4. 中場分析
@@ -43,7 +43,7 @@ document.getElementById('predictBtn').addEventListener('click', function() {
         halfBox.style.display = 'block';
         
         const hDir = hProjH > lH ? '<b style="color:#f87171;">🔥 預測：大分</b>' : '<b style="color:#60a5fa;">❄️ 預測：小分</b>';
-        analysis += `• 中場線(${lH}): 預計 ${hProjH} | ${hDir}<br>`;
+        analysis += `• 中場盤口(${lH}): 預計 ${hProjH} | ${hDir}<br>`;
         if (hProb > 75) shouldConfetti = true;
     } else {
         halfBox.style.display = 'none';
@@ -56,8 +56,8 @@ document.getElementById('predictBtn').addEventListener('click', function() {
         document.getElementById('fullProbPercent').innerText = fProb.toFixed(1) + "%";
         
         const fDir = projTotal > lF ? '<b style="color:#f87171;">🔥 預測：大分</b>' : '<b style="color:#60a5fa;">❄️ 預測：小分</b>';
-        analysis += `• 終場線(${lF}): 預計 ${projTotal} | ${fDir}<br>`;
-        analysis += `• 距分數線偏差: <span style="color:#4facfe">${Math.abs(projTotal - lF).toFixed(1)} 分</span>`;
+        analysis += `• 終場盤口(${lF}): 預計 ${projTotal} | ${fDir}<br>`;
+        analysis += `• 距終場盤口諞差: <span style="color:#4facfe">${Math.abs(projTotal - lF).toFixed(1)} 分</span>`;
         if (fProb > 75) shouldConfetti = true;
     }
 
