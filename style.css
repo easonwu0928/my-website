@@ -1,169 +1,270 @@
-/* 保留原本的 CSS，並確認以下部分 */
-input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-sizing: border-box;
-    text-align: center; /* 讓數字居中 */
-}
-
-/* 讓分:秒的輸入框看起來更連貫 */
-#minLeft, #secLeft {
-    flex: 1;
-}
+/* 基礎設定 */
 :root {
-    --primary: #4facfe;
-    --secondary: #00f2fe;
-    --bg: #0f172a;
+    --primary: #4facfe;       /* 主色：亮藍 */
+    --secondary: #00f2fe;     /* 次色：青藍 */
+    --accent-orange: #f093fb; /* 中場進度條：亮紫 */
+    --accent-red: #f5576c;    /* 中場進度條：亮紅 */
+    --bg-dark: #0f172a;       /* 背景深藍黑 */
     --card-bg: rgba(30, 41, 59, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
 }
 
 body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background: var(--bg);
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    background-color: var(--bg-dark);
+    background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
     color: white;
     margin: 0;
     display: flex;
     justify-content: center;
     min-height: 100vh;
     padding: 20px;
-    transition: 0.5s;
+    transition: background 0.5s ease;
 }
 
-.container { width: 100%; max-width: 450px; }
+.container {
+    width: 100%;
+    max-width: 480px;
+}
 
+/* 標題設計 */
 .glass-header h1 {
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+    font-weight: 800;
     letter-spacing: 2px;
     background: linear-gradient(to right, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    text-shadow: 0 10px 20px rgba(0,0,0,0.3);
 }
 
+/* 主卡片樣式 */
 .main-card {
     background: var(--card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 24px;
-    padding: 30px;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--border-color);
+    border-radius: 28px;
+    padding: 25px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .badge {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
     color: var(--primary);
     margin-bottom: 15px;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
 }
 
+/* 分數輸入區 */
 .score-inputs {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 25px;
+    justify-content: space-around;
+    margin-bottom: 30px;
 }
 
-.score-field { text-align: center; width: 40%; }
-.score-vs { font-size: 2rem; font-weight: 100; color: #475569; }
+.score-field {
+    text-align: center;
+    width: 40%;
+}
 
-label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 8px; }
+.score-vs {
+    font-size: 1.5rem;
+    font-weight: 200;
+    color: #64748b;
+}
+
+label {
+    font-size: 12px;
+    color: #94a3b8;
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
 
 input, select {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(15, 23, 42, 0.8);
     border: 1px solid #334155;
-    border-radius: 12px;
+    border-radius: 14px;
     color: white;
     padding: 12px;
     width: 100%;
     box-sizing: border-box;
     font-size: 1.2rem;
+    font-weight: 600;
     text-align: center;
+    transition: all 0.3s ease;
 }
 
-input:focus { border-color: var(--primary); outline: none; }
+input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2);
+}
 
-.time-row { display: flex; gap: 15px; margin-bottom: 25px; }
-.time-inputs { display: flex; align-items: center; gap: 5px; }
+/* 節數與時間排版 */
+.time-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
 
-.vegas-section { margin-top: 20px; }
-.line-inputs { display: flex; gap: 10px; }
+.time-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
+.time-inputs span {
+    font-size: 1.5rem;
+    color: #475569;
+}
+
+/* 運彩盤口區 */
+.vegas-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.line-inputs {
+    display: flex;
+    gap: 12px;
+}
+
+/* 計算按鈕 */
 button {
-    margin-top: 30px;
+    margin-top: 35px;
     width: 100%;
-    padding: 16px;
-    border-radius: 16px;
+    padding: 18px;
+    border-radius: 18px;
     border: none;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #000;
+    color: #0f172a;
+    font-size: 1.1rem;
     font-weight: 800;
+    letter-spacing: 1px;
     cursor: pointer;
-    box-shadow: 0 10px 15px -3px rgba(79, 172, 254, 0.4);
+    box-shadow: 0 15px 30px -5px rgba(79, 172, 254, 0.4);
+    transition: all 0.3s ease;
 }
 
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 35px -5px rgba(79, 172, 254, 0.5);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+/* 結果卡片 */
 .result-card {
-    margin-top: 25px;
+    margin-top: 30px;
     background: #1e293b;
-    border-radius: 24px;
-    padding: 25px;
+    border-radius: 28px;
+    padding: 30px;
     border: 2px solid #334155;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.result-header { font-size: 12px; color: var(--secondary); text-align: center; margin-bottom: 20px; }
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-.result-grid { display: flex; justify-content: space-around; margin-bottom: 20px; }
+.result-header {
+    font-size: 12px;
+    color: var(--secondary);
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.result-grid {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+}
+
 .res-item { text-align: center; }
-.res-label { font-size: 11px; color: #94a3b8; display: block; }
-.res-value { font-size: 1.8rem; font-weight: 800; }
-.res-sub { display: block; font-size: 12px; color: #4ade80; margin-top: 5px; }
+.res-label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 5px; }
+.res-value { font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
 
-.analysis-box {
-    background: rgba(15, 23, 42, 0.5);
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 13px;
-    line-height: 1.6;
-}
-/* 接續之前的 CSS */
-
+/* 進度條容器 */
 .probability-container {
     margin-top: 20px;
     padding: 15px;
     background: rgba(15, 23, 42, 0.4);
-    border-radius: 12px;
+    border-radius: 16px;
 }
 
 .prob-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 13px;
     color: #94a3b8;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .prob-num {
-    color: #4facfe;
-    font-weight: bold;
+    font-weight: 800;
     font-size: 16px;
 }
 
 .prob-bar-bg {
-    height: 10px;
-    background: #334155;
-    border-radius: 10px;
+    height: 12px;
+    background: #0f172a;
+    border-radius: 20px;
     overflow: hidden;
+    padding: 2px;
 }
 
 .prob-bar-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #4facfe, #00f2fe);
-    box-shadow: 0 0 10px rgba(79, 172, 254, 0.6);
-    transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 20px;
+    transition: width 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.1);
 }
 
-.analysis-box b { color: #4facfe; }
+/* 進度條顏色定義 */
+.prob-bar-fill.blue {
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    box-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
+}
+
+.prob-bar-fill.orange {
+    background: linear-gradient(90deg, var(--accent-orange), var(--accent-red));
+    box-shadow: 0 0 15px rgba(245, 87, 108, 0.5);
+}
+
+/* 分析文字盒 */
+.analysis-box {
+    margin-top: 25px;
+    background: rgba(15, 23, 42, 0.6);
+    padding: 18px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.analysis-box b {
+    color: var(--primary);
+}
+
+/* 隱藏 Chrome/Safari/Edge 的數字輸入箭頭 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
