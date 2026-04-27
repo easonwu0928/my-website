@@ -74,41 +74,61 @@ document.getElementById('predictBtn').addEventListener('click', function() {
         else if (fProb < 30) effectType = 'ice';
     }
 
-    document.getElementById('analysis').innerHTML = analysis;
+    document.getElementById('predictBtn').addEventListener('click', function() {
+    // ... 前面所有的計算邏輯 (h, a, projTotal, lF 等) 保持不變 ...
+    
+    // [這裡省略中間的計算代碼，請保留你原本的邏輯]
 
-    // --- 核心：火與冰的特效邏輯 ---
+    // --- 視覺特效優化：火與冰的平衡 ---
     if (typeof confetti === 'function' && effectType) {
         if (effectType === 'fire') {
-            // 火焰效果：紅色、橘色、黃色，向上噴發
-            const duration = 2 * 1000;
-            const end = Date.now() + duration;
+            // 火焰：改為左右兩側開花，不擋住中間的分數數據
+            const fireConfig = {
+                particleCount: 100,
+                spread: 60,
+                origin: { y: 0.7 },
+                colors: ['#ff4500', '#ff8c00', '#ffd700'],
+                scalar: 1.2
+            };
+
+            confetti({
+                ...fireConfig,
+                angle: 60, // 往右噴
+                origin: { x: 0, y: 0.7 }
+            });
+            confetti({
+                ...fireConfig,
+                angle: 120, // 往左噴
+                origin: { x: 1, y: 0.7 }
+            });
+
+        } else if (effectType === 'ice') {
+            // 冰凍：增加數量與密集度，模擬寒氣逼人的感覺
+            const duration = 2.5 * 1000;
+            const animationEnd = Date.now() + duration;
 
             (function frame() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return;
+
                 confetti({
-                    particleCount: 5,
-                    angle: 90,
-                    spread: 45,
-                    origin: { y: 0.8 },
-                    colors: ['#ff4500', '#ff8c00', '#ffd700'],
-                    scalar: 1.2,
-                    gravity: 0.5
+                    particleCount: 3, // 每一幀噴出少量但持續，形成密集感
+                    startVelocity: 0,
+                    ticks: 120,
+                    origin: {
+                        x: Math.random(),
+                        // 隨機從頂部不同位置落下
+                        y: Math.random() * 0.2
+                    },
+                    colors: ['#ffffff', '#afeeee', '#00bfff', '#f0f9ff'],
+                    shapes: ['circle'],
+                    gravity: 0.7,
+                    scalar: Math.random() * 0.5 + 0.5,
+                    drift: Math.random() * 2 - 1 // 輕微左右晃動
                 });
-                if (Date.now() < end) requestAnimationFrame(frame);
+                
+                requestAnimationFrame(frame);
             }());
-        } else if (effectType === 'ice') {
-            // 冰凍效果：白色、淺藍、深藍，像雪花般落下
-            confetti({
-                particleCount: 100,
-                startVelocity: 0,
-                ticks: 200,
-                origin: { y: 0.3 }, // 從上方落下
-                colors: ['#ffffff', '#afeeee', '#00bfff'],
-                shapes: ['circle'],
-                gravity: 0.4,
-                scalar: 0.8,
-                drift: 0,
-                spread: 360
-            });
         }
     }
 
