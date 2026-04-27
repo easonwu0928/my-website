@@ -111,3 +111,64 @@ button {
 .prob-bar-fill.orange { background: linear-gradient(90deg, #f093fb, #f5576c); box-shadow: 0 0 10px rgba(245, 87, 108, 0.5); }
 
 .analysis-box { margin-top: 20px; padding: 18px; background: rgba(15, 23, 42, 0.6); border-radius: 18px; font-size: 14px; line-height: 1.8; border: 1px solid rgba(255,255,255,0.05); }
+/* SEO 資訊區塊樣式 */
+.info-section {
+    margin-top: 40px;
+    padding-bottom: 50px;
+    color: #cbd5e1;
+}
+
+.info-card {
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    line-height: 1.6;
+}
+
+.info-card h3 {
+    color: #4facfe;
+    margin-top: 0;
+    font-size: 1.2rem;
+    border-bottom: 1px solid rgba(79, 172, 254, 0.3);
+    padding-bottom: 10px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.info-item h4 {
+    color: #fbbf24;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.info-item ul {
+    padding-left: 20px;
+    font-size: 0.9rem;
+}
+
+.info-item p {
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+.disclaimer {
+    margin-top: 25px;
+    font-size: 0.8rem;
+    color: #64748b;
+    text-align: center;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+
+/* 手機版自動調整為單欄 */
+@media (max-width: 480px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
