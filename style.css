@@ -268,3 +268,27 @@ input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+.total-info {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.tag {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.tag.current {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.tag.projected {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+}
