@@ -2,51 +2,49 @@ const apiKey = 'f078b81e8cmshed755ca4dea5f70p1393e9jsnf05b9e444248';
 
 document.getElementById('fetchDataBtn').addEventListener('click', async function() {
     const status = document.getElementById('apiStatus');
-    status.innerText = "專業數據連線成功，抓取比分中...";
+    status.innerText = "連線中...";
 
     const options = {
         method: 'GET',
         headers: {
             'x-rapidapi-key': apiKey,
-            'x-rapidapi-host': 'api-basketball.p.rapidapi.com'
+            'x-rapidapi-host': 'api-basketball.p.rapidapi.com' // 確保是這個 Host
         }
     };
 
     try {
-        // 使用這款 API 的正確 Scoreboard 路徑
-        // 12 代表 NBA, 賽季設為當前賽季
-        const url = `https://api-basketball.p.rapidapi.com/games?league=12&season=2025-2026`;
-        const response = await fetch(url, options);
-        const data = await response.json();
+        // 抓取 NBA (League 12) 的比賽
+        // 注意：如果你剛剛才點訂閱，請等待約 1-2 分鐘讓伺服器同步
+        const response = await fetch('https://api-basketball.p.rapidapi.com/games?league=12&season=2025-2026', options);
         
-        console.log("新 API 資料回傳:", data);
+        // 如果還是 403，我們會抓到這個錯誤
+        if (response.status === 403) {
+            status.innerText = "❌ 403：權限尚未生效，請稍等一分鐘再試或確認已點擊 Subscribe";
+            return;
+        }
 
-        // 篩選有分數的比賽 (從最新的開始找)
-        const games = data.response ? data.response.filter(g => g.scores.home.total !== null).reverse() : [];
+        const data = await response.json();
+        console.log("成功抓取資料:", data);
+
+        // 找尋有分數的比賽
+        const games = data.response ? data.response.filter(g => g.scores.home.total !== null) : [];
 
         if (games.length > 0) {
-            const game = games[0]; // 抓最近一場
-            
-            // 根據 API-BASKETBALL 的資料結構填入
+            const game = games[games.length - 1]; // 抓最新一場
             document.getElementById('homeScore').value = game.scores.home.total;
             document.getElementById('awayScore').value = game.scores.away.total;
             
-            // 處理節數：如果是結束 (FT) 顯示 4，其餘抓取實際節數
-            let q = "1";
-            if (game.status.short === "FT") {
-                q = "4";
-            } else {
-                q = game.status.short.replace(/[^0-9]/g, '') || "1";
-            }
+            // 自動判斷節數
+            const q = game.status.short === "FT" ? "4" : (game.status.short.replace(/[^0-9]/g, '') || "1");
             document.getElementById('quarter').value = q;
             
-            status.innerText = `✅ 同步成功：${game.teams.home.name} vs ${game.teams.away.name}`;
+            status.innerText = `✅ 已同步：${game.teams.home.name} vs ${game.teams.away.name}`;
         } else {
-            status.innerText = "😴 目前賽程表中暫無即時比分數據";
+            status.innerText = "😴 目前無進行中的 NBA 比賽";
         }
     } catch (error) {
-        console.error("抓取失敗:", error);
-        status.innerText = "❌ 資料解析失敗，請稍後再試";
+        console.error(error);
+        status.innerText = "❌ 連線異常，請確認 API Key 是否正確";
     }
 });
 
