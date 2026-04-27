@@ -1,71 +1,96 @@
 document.getElementById('predictBtn').addEventListener('click', function() {
-    const h = parseFloat(document.getElementById('homeScore').value);
-    const a = parseFloat(document.getElementById('awayScore').value);
-    const q = parseInt(document.getElementById('quarter').value);
-    const m = parseFloat(document.getElementById('minLeft').value) || 0;
-    const s = parseFloat(document.getElementById('secLeft').value) || 0;
-    const lH = parseFloat(document.getElementById('lineHalf').value);
-    const lF = parseFloat(document.getElementById('lineFull').value);
+    // 1. 抓取輸入值
+    const homeScore = parseFloat(document.getElementById('homeScore').value);
+    const awayScore = parseFloat(document.getElementById('awayScore').value);
+    const quarter = parseInt(document.getElementById('quarter').value);
+    const minLeft = parseFloat(document.getElementById('minLeft').value) || 0;
+    const secLeft = parseFloat(document.getElementById('secLeft').value) || 0;
+    const lineHalf = parseFloat(document.getElementById('lineHalf').value);
+    const lineFull = parseFloat(document.getElementById('lineFull').value);
 
-    if (isNaN(h) || isNaN(a)) return alert("請輸入主客隊目前分數");
+    // 2. 基礎防呆
+    if (isNaN(homeScore) || isNaN(awayScore)) {
+        alert("請輸入目前的比分！");
+        return;
+    }
 
-    // 1. 時間計算
-    const playedInQ = 12 - (m + s/60);
-    const totalPlayed = (q - 1) * 12 + playedInQ;
-    const safeT = totalPlayed <= 0 ? 0.1 : totalPlayed;
+    // 3. 計算已比賽時間 (NBA 每節 12 分鐘，總共 48 分鐘)
+    const totalTimeLeftInQuarter = minLeft + (secLeft / 60);
+    const minutesPlayedInQuarter = 12 - totalTimeLeftInQuarter;
+    const totalMinutesPlayed = (quarter - 1) * 12 + minutesPlayedInQuarter;
+    const safePlayed = totalMinutesPlayed <= 0 ? 0.1 : totalMinutesPlayed;
 
-    // 2. 分數預測
-    const hF = Math.round((h / safeT) * 48);
-    const aF = Math.round((a / safeT) * 48);
-    const fullProjTotal = hF + aF;
-    const winRate = (Math.pow(hF, 13.91) / (Math.pow(hF, 13.91) + Math.pow(aF, 13.91))) * 100;
+    // 4. 預測邏輯
+    // 預測終場
+    const homeFull = Math.round((homeScore / safePlayed) * 48);
+    const awayFull = Math.round((awayScore / safePlayed) * 48);
+    const fullProjTotal = homeFull + awayFull;
+    
+    // 5. 勝率計算 (畢氏勝率公式)
+    const power = 13.91;
+    const winRate = (Math.pow(homeFull, power) / (Math.pow(homeFull, power) + Math.pow(awayFull, power))) * 100;
 
-    // 3. UI 基礎更新
-    document.getElementById('result').style.display = 'block';
-    document.getElementById('finalScore').innerText = `${hF} : ${aF}`;
+    // 6. 更新 UI 基礎顯示
+    const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'block';
+    document.getElementById('finalScore').innerText = `${homeFull} : ${awayFull}`;
     document.getElementById('winRate').innerText = `${winRate.toFixed(1)}%`;
     document.getElementById('fullProjTotal').innerText = fullProjTotal;
 
-    let shouldCelebrate = false;
+    let analysisHtml = `<strong style="color:#4a90e2;">🔍 深度盤口分析：</strong><br>`;
 
-    // 4. 中場過盤率計算 (限打完前兩節前)
+    // 7. 中場分析邏輯 (僅在第二節結束前顯示)
     const halfContainer = document.getElementById('halfProbContainer');
-    if (totalPlayed < 24 && !isNaN(lH)) {
-        const hH = Math.round((h / safeT) * 24);
-        const aH = Math.round((a / safeT) * 24);
-        const halfProjTotal = hH + aH;
+    if (totalMinutesPlayed < 24 && !isNaN(lineHalf)) {
+        const homeHalf = Math.round((homeScore / safePlayed) * 24);
+        const awayHalf = Math.round((awayScore / safePlayed) * 24);
+        const halfProjTotal = homeHalf + awayHalf;
         document.getElementById('halfProjTotal').innerText = halfProjTotal;
-        
-        let hProb = 50 + (halfProjTotal - lH) * 4; // 中場震盪大，權重設為 4
+
+        // 計算過盤率
+        let hProb = 50 + (halfProjTotal - lineHalf) * 4;
         hProb = Math.max(2, Math.min(98, hProb));
-        
         document.getElementById('halfProbBar').style.width = hProb + "%";
         document.getElementById('halfProbPercent').innerText = hProb.toFixed(1) + "%";
         halfContainer.style.display = 'block';
-        if (hProb > 70) shouldCelebrate = true;
+
+        // 判斷大/小分
+        const halfResult = halfProjTotal > lineHalf ? 
+            '<b style="color:#e74c3c;">🔥 預測：大分</b>' : 
+            '<b style="color:#3498db;">❄️ 預測：小分</b>';
+        analysisHtml += `• 中場(${lineHalf}): 預計總分 ${halfProjTotal} | ${halfResult}<br>`;
     } else {
         halfContainer.style.display = 'none';
     }
 
-    // 5. 終場過盤率計算
-    if (!isNaN(lF)) {
-        let fProb = 50 + (fullProjTotal - lF) * 2.5;
+    // 8. 終場分析邏輯
+    if (!isNaN(lineFull)) {
+        let fProb = 50 + (fullProjTotal - lineFull) * 2.5;
         fProb = Math.max(2, Math.min(98, fProb));
         document.getElementById('fullProbBar').style.width = fProb + "%";
         document.getElementById('fullProbPercent').innerText = fProb.toFixed(1) + "%";
-        if (fProb > 70) shouldCelebrate = true;
+
+        // 判斷大/小分
+        const fullResult = fullProjTotal > lineFull ? 
+            '<b style="color:#e74c3c;">🔥 預測：大分</b>' : 
+            '<b style="color:#3498db;">❄️ 預測：小分</b>';
+        analysisHtml += `• 終場(${lineFull}): 預計總分 ${fullProjTotal} | ${fullResult}<br>`;
+        
+        // 距離分數線差幾分
+        const diff = Math.abs(fullProjTotal - lineFull).toFixed(1);
+        analysisHtml += `• 距分數線目前偏差：<b>${diff}</b> 分<br>`;
+    } else {
+        analysisHtml += `• 未輸入終場盤口，無法分析大小分趨勢。<br>`;
     }
 
-    // 6. 撒彩帶
-    if (shouldCelebrate) {
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.7 },
-            colors: ['#4facfe', '#f093fb', '#4ade80']
-        });
-    }
+    // 寫入分析盒
+    document.getElementById('analysis').innerHTML = analysisHtml;
 
-    // 自動捲動
-    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+    // 9. 背景與視覺效果
+    // 預測勝出方變色
+    document.body.style.background = homeFull >= awayFull ? 
+        "linear-gradient(135deg, #1d976c, #93f9b9)" : "linear-gradient(135deg, #eb3349, #f45c43)";
+
+    // 自動滾動到結果
+    resultDiv.scrollIntoView({ behavior: 'smooth' });
 });
