@@ -31,14 +31,32 @@ document.getElementById('predictBtn').addEventListener('click', function() {
     document.getElementById('winRate').innerText = `${winRate.toFixed(1)}%`;
 
     // 4. 平滑機率計算
-    function calculateProb(proj, line, sensitivity) {
-        if (isNaN(line)) return 50;
-        const diff = proj - line;
-        return Math.max(2, Math.min(98, (1 / (1 + Math.exp(-(sensitivity * diff)))) * 100));
+    function calculateWinRate(h, a, hF, aF, progress) {
+    if (h + a === 0) return 50;
+
+    const diff = hF - aF; // 預測終場分差
+    const actualDiff = h - a; // 目前實際分差
+
+    // 1. 降低邏輯回歸的敏感度（從 0.15 降到 0.06）
+    // 這樣領先 10 分時，基礎勝率大約會在 65% 左右，而不是 90%
+    let predictedWR = (1 / (1 + Math.exp(-(0.06 * diff)))) * 100;
+
+    // 2. 更加重視「比賽進度」的稀釋作用
+    // progress 是 0~1。我們使用 Math.pow(progress, 0.7) 
+    // 讓比賽在第一節時，勝率會被強烈拉向 50%
+    let timeFactor = Math.pow(progress, 0.7); 
+    
+    // 3. 計算最終勝率：50% (基礎) + (預測勝率 - 50%) * 時間因子
+    // 這樣第一節領先 10 分，勝率會顯示在 60%~70% 之間，這才符合現實
+    let finalWinRate = 50 + (predictedWR - 50) * timeFactor;
+
+    // 4. 極端分差保護 (如果真的領先 50 分以上，維持高勝率)
+    if (Math.abs(actualDiff) > 30 && progress > 0.5) {
+        finalWinRate = predictedWR;
     }
 
-    let analysis = "🔍 <b>數據分析報告：</b><br>";
-    let effectType = null;
+    return Math.max(1, Math.min(99.9, finalWinRate));
+    }
 
     // 中場分析
     const halfBox = document.getElementById('halfProbContainer');
