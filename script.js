@@ -18,20 +18,36 @@ document.getElementById('predictBtn').addEventListener('click', function() {
     const aF = Math.round((a / safePlayed) * 48);
     const projTotal = hF + aF;
 
-    // 3. 顯示結果區塊與基本數據
+// 3. 顯示結果區塊與基本數據
     document.getElementById('result').style.display = 'block';
     document.getElementById('finalScore').innerText = `${hF} : ${aF}`;
     document.getElementById('currentTotal').innerText = h + a;
     document.getElementById('projectedTotal').innerText = projTotal;
     document.getElementById('fullProjTotal').innerText = projTotal;
 
-    // --- 優化後的勝率計算邏輯 ---
+    // --- 關鍵修正：執行勝率計算並更新顯示 ---
+    const progress = timePlayed / totalTime;
+    const winRate = calculateWinRate(h, a, hF, aF, progress);
+    document.getElementById('winRate').innerText = `${winRate.toFixed(1)}%`;
+
+    // 4. 勝率計算邏輯函數 (保持在裡面沒關係)
     function calculateWinRate(h, a, hF, aF, progress) {
-    if (h + a === 0) return 50;
+        if (h + a === 0) return 50;
+        const diff = hF - aF; 
+        const actualDiff = h - a; 
 
-    const diff = hF - aF; // 預測分差
-    const actualDiff = h - a; // 當前實際分差
+        let predictedWR = (1 / (1 + Math.exp(-(0.15 * diff)))) * 100;
+        let actualWR = (1 / (1 + Math.exp(-(0.2 * actualDiff)))) * 100;
+        let combinedWR = (predictedWR * 0.7) + (actualWR * 0.3);
 
+        let finalWinRate;
+        if (Math.abs(diff) > 30) {
+            finalWinRate = combinedWR;
+        } else {
+            finalWinRate = 50 * (1 - Math.pow(progress, 0.3)) + combinedWR * Math.pow(progress, 0.3);
+        }
+        return Math.max(0.1, Math.min(99.9, finalWinRate));
+    }
     // 1. 計算基於預測分差的基礎勝率 (使用更強的係數 0.15)
     // 這樣領先 20 分時勝率就約 95%，領先 40 分就接近 99.7%
     let predictedWR = (1 / (1 + Math.exp(-(0.15 * diff)))) * 100;
