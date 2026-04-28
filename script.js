@@ -25,10 +25,28 @@ document.getElementById('predictBtn').addEventListener('click', function() {
     document.getElementById('projectedTotal').innerText = projTotal;
     document.getElementById('fullProjTotal').innerText = projTotal;
 
-    // 4. 勝率計算 (基於當前比分趨勢)
-    const currentTrendWR = (h + a === 0) ? 50 : (Math.pow(h, 13.91) / (Math.pow(h, 13.91) + Math.pow(a, 13.91))) * 100;
+    // --- 優化後的勝率計算邏輯 ---
+    function calculateWinRate(h, a, hF, aF, progress) {
+        if (h + a === 0) return 50; // 比賽還沒開始
+
+        // 1. 基於預測最終得分的領先幅度 (hF vs aF)
+        const diff = hF - aF;
+    
+        // 2. 核心算法：邏輯回歸模擬 (讓大幅度領先時勝率迅速拉開)
+        // 係數 0.1 可以確保差 20 分時勝率接近 90%，差 40 分以上接近 99%
+        let predictedWR = (1 / (1 + Math.exp(-(0.1 * diff)))) * 100;
+
+        // 3. 根據比賽進度 (progress) 動態調整權重
+        // 比賽越接近尾聲，當前領先幅度的權重就越高，50% 的影響力就越低
+        // 使用 Math.pow(progress, 0.5) 讓勝率在比賽前段就能更快反應差距
+        const finalWinRate = 50 * (1 - Math.pow(progress, 0.5)) + predictedWR * Math.pow(progress, 0.5);
+
+        return Math.max(1, Math.min(99.9, finalWinRate)); // 限制在 1% ~ 99.9%
+    }
+
+    // 在你的點擊事件監聽器中使用它：
     const progress = timePlayed / totalTime;
-    const winRate = 50 * (1 - progress) + currentTrendWR * progress;
+    const winRate = calculateWinRate(h, a, hF, aF, progress);
     document.getElementById('winRate').innerText = `${winRate.toFixed(1)}%`;
 
     // 5. 平滑機率計算函數
