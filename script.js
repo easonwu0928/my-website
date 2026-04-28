@@ -34,28 +34,28 @@ document.getElementById('predictBtn').addEventListener('click', function() {
     function calculateWinRate(h, a, hF, aF, progress) {
     if (h + a === 0) return 50;
 
-    const diff = hF - aF; // 預測終場分差
-    const actualDiff = h - a; // 目前實際分差
+    const diff = hF - aF; // 預測最終分差
+    const actualDiff = h - a; // 當前實際分差
 
-    // 1. 降低邏輯回歸的敏感度（從 0.15 降到 0.06）
-    // 這樣領先 10 分時，基礎勝率大約會在 65% 左右，而不是 90%
-    let predictedWR = (1 / (1 + Math.exp(-(0.06 * diff)))) * 100;
+    // 1. 使用中度敏感係數 0.1
+    // 預測贏 10 分時，基礎勝率約 73%；預測贏 20 分時，基礎勝率約 88%
+    let baseWinProb = (1 / (1 + Math.exp(-(0.1 * diff)))) * 100;
 
-    // 2. 更加重視「比賽進度」的稀釋作用
-    // progress 是 0~1。我們使用 Math.pow(progress, 0.7) 
-    // 讓比賽在第一節時，勝率會被強烈拉向 50%
-    let timeFactor = Math.pow(progress, 0.7); 
-    
-    // 3. 計算最終勝率：50% (基礎) + (預測勝率 - 50%) * 時間因子
-    // 這樣第一節領先 10 分，勝率會顯示在 60%~70% 之間，這才符合現實
-    let finalWinRate = 50 + (predictedWR - 50) * timeFactor;
+    // 2. 優化時間因子：使用 Math.sqrt (平方根)
+    // 這樣比賽打到一半 (0.5) 時，因子就已經達到 0.7 左右
+    // 這會讓比賽中後段的勝率反應更真實，不會因為時間還沒走完就過度壓低勝率
+    let timeWeight = Math.sqrt(progress);
 
-    // 4. 極端分差保護 (如果真的領先 50 分以上，維持高勝率)
-    if (Math.abs(actualDiff) > 30 && progress > 0.5) {
-        finalWinRate = predictedWR;
-    }
+    // 3. 混合計算
+    // 勝率 = 50% + (基礎勝率 - 50%) * 時間權重
+    let finalWinRate = 50 + (baseWinProb - 50) * timeWeight;
 
-    return Math.max(1, Math.min(99.9, finalWinRate));
+    // 4. 實體保底機制 (防止預測數據因節奏波動產生低級錯誤)
+    // 如果現在已經領先 15 分以上，勝率不應該低於 75%
+    if (actualDiff >= 15 && finalWinRate < 75) finalWinRate = 75 + (progress * 10);
+    if (actualDiff <= -15 && finalWinRate > 25) finalWinRate = 25 - (progress * 10);
+
+    return Math.max(0.1, Math.min(99.9, finalWinRate));
     }
 
     // 中場分析
