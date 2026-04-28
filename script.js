@@ -27,27 +27,36 @@ document.getElementById('predictBtn').addEventListener('click', function() {
 
     // --- 優化後的勝率計算邏輯 ---
     function calculateWinRate(h, a, hF, aF, progress) {
-        if (h + a === 0) return 50; // 比賽還沒開始
+    if (h + a === 0) return 50;
 
-        // 1. 基於預測最終得分的領先幅度 (hF vs aF)
-        const diff = hF - aF;
-    
-        // 2. 核心算法：邏輯回歸模擬 (讓大幅度領先時勝率迅速拉開)
-        // 係數 0.1 可以確保差 20 分時勝率接近 90%，差 40 分以上接近 99%
-        let predictedWR = (1 / (1 + Math.exp(-(0.1 * diff)))) * 100;
+    const diff = hF - aF; // 預測分差
+    const actualDiff = h - a; // 當前實際分差
 
-        // 3. 根據比賽進度 (progress) 動態調整權重
-        // 比賽越接近尾聲，當前領先幅度的權重就越高，50% 的影響力就越低
-        // 使用 Math.pow(progress, 0.5) 讓勝率在比賽前段就能更快反應差距
-        const finalWinRate = 50 * (1 - Math.pow(progress, 0.5)) + predictedWR * Math.pow(progress, 0.5);
+    // 1. 計算基於預測分差的基礎勝率 (使用更強的係數 0.15)
+    // 這樣領先 20 分時勝率就約 95%，領先 40 分就接近 99.7%
+    let predictedWR = (1 / (1 + Math.exp(-(0.15 * diff)))) * 100;
 
-        return Math.max(1, Math.min(99.9, finalWinRate)); // 限制在 1% ~ 99.9%
+    // 2. 加入「當前實體分差」的保底機制
+    // 如果現在已經贏超過 20 分，勝率不應該低於 90%
+    let actualWR = (1 / (1 + Math.exp(-(0.2 * actualDiff)))) * 100;
+
+    // 3. 動態權重分配
+    // 比賽越早期，我們結合「預測」與「實際」；比賽越晚，越看重「預測」
+    // 取兩者之大值，避免 144:36 這種情況被 progress 稀釋
+    let combinedWR = (predictedWR * 0.7) + (actualWR * 0.3);
+
+    // 根據進度平滑化，但如果是大屠殺，則無視 progress 修正
+    let finalWinRate;
+    if (Math.abs(diff) > 30) {
+        // 分差過大，直接給出預測勝率，不再被時間稀釋
+        finalWinRate = combinedWR;
+    } else {
+        // 分差較小時，才考慮時間進度，讓勝率隨時間慢慢穩定
+        finalWinRate = 50 * (1 - Math.pow(progress, 0.3)) + combinedWR * Math.pow(progress, 0.3);
     }
 
-    // 在你的點擊事件監聽器中使用它：
-    const progress = timePlayed / totalTime;
-    const winRate = calculateWinRate(h, a, hF, aF, progress);
-    document.getElementById('winRate').innerText = `${winRate.toFixed(1)}%`;
+    return Math.max(0.1, Math.min(99.9, finalWinRate));
+    }
 
     // 5. 平滑機率計算函數
     function calculateProb(proj, line, sensitivity) {
