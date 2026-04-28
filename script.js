@@ -118,3 +118,32 @@ document.getElementById('predictBtn').addEventListener('click', function() {
     // 平滑滾動到結果
     document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
 });
+// 快速加分函數
+function addScore(targetId, points, event) {
+    const input = document.getElementById(targetId);
+    let currentScore = parseInt(input.value) || 0;
+    input.value = currentScore + points;
+
+    // 如果是 3 分球，觸發手勢動畫
+    if (points === 3 && event) {
+        showThreePointerEffect(event.clientX, event.clientY);
+    }
+}
+
+// 顯示 3 分手勢效果
+function showThreePointerEffect(x, y) {
+    const emoji = document.createElement('div');
+    emoji.className = 'three-pointer-emoji';
+    emoji.innerText = '👌'; // 你也可以換成 '🏀' 或 '🔥'
+    
+    // 設定位置在點擊點附近
+    emoji.style.left = (x - 20) + 'px';
+    emoji.style.top = (y - 40) + 'px';
+    
+    document.body.appendChild(emoji);
+    
+    // 動畫結束後移除元素
+    setTimeout(() => {
+        emoji.remove();
+    }, 800);
+}

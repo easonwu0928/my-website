@@ -172,3 +172,41 @@ button {
         grid-template-columns: 1fr;
     }
 }
+.quick-btns {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.add-btn {
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border-radius: 6px !important;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: auto !important; /* 覆蓋原本按鈕寬度 */
+}
+
+.add-btn:hover {
+    background: var(--primary) !important;
+    color: #0f172a !important;
+}
+
+/* 3分球手勢動畫樣式 */
+.three-pointer-emoji {
+    position: absolute;
+    font-size: 40px;
+    pointer-events: none;
+    animation: popAndFade 0.8s ease-out forwards;
+    z-index: 1000;
+}
+
+@keyframes popAndFade {
+    0% { transform: scale(0.5) translateY(0); opacity: 0; }
+    50% { transform: scale(1.2) translateY(-50px); opacity: 1; }
+    100% { transform: scale(1) translateY(-80px); opacity: 0; }
+}

@@ -15,14 +15,29 @@
         
         <div class="card">
             <div class="section-title">比賽現況輸入</div>
+    
             <div class="input-group">
                 <label>主隊目前得分：</label>
                 <input type="number" id="homeScore" placeholder="0">
+                <div class="quick-btns">
+                    <button type="button" class="add-btn" onclick="addScore('homeScore', 1)">+1</button>
+                    <button type="button" class="add-btn" onclick="addScore('homeScore', 2)">+2</button>
+                    <button type="button" class="add-btn" onclick="addScore('homeScore', 3, event)">+3</button>
+               </div>
             </div>
+
+            <div class="score-vs">VS</div>
+
             <div class="input-group">
                 <label>客隊目前得分：</label>
                 <input type="number" id="awayScore" placeholder="0">
+                <div class="quick-btns">
+                    <button type="button" class="add-btn" onclick="addScore('awayScore', 1)">+1</button>
+                    <button type="button" class="add-btn" onclick="addScore('awayScore', 2)">+2</button>
+                    <button type="button" class="add-btn" onclick="addScore('awayScore', 3, event)">+3</button>
+                </div>
             </div>
+
             <div class="input-row">
                 <div class="input-group">
                     <label>目前節數：</label>
